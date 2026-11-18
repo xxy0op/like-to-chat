@@ -1,0 +1,550 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>没有话题我们可以聊</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #f4efe7;
+        --bg-deep: #ece4d6;
+        --ink: #2b2620;
+        --ink-soft: #6f6455;
+        --card: #fdfaf4;
+        --card-line: #ddd2bf;
+        --accent: #b4552d;
+        --accent-ink: #fff7ee;
+        --accent-soft: #f3ddcb;
+        --moon: #c98a2d;
+        --shadow: 0 18px 40px rgba(84, 62, 32, .14);
+        --star: rgba(184, 85, 45, .35);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #101014;
+          --bg-deep: #0a0a0d;
+          --ink: #ece7dd;
+          --ink-soft: #9b958a;
+          --card: #1a1a20;
+          --card-line: #2e2e38;
+          --accent: #e0a458;
+          --accent-ink: #221806;
+          --accent-soft: #2c2417;
+          --moon: #e8c07d;
+          --shadow: 0 18px 44px rgba(0, 0, 0, .55);
+          --star: rgba(232, 192, 125, .5);
+        }
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        font-family: "Noto Sans SC", -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+        background:
+          radial-gradient(1100px 520px at 85% -120px, var(--bg-deep), transparent 70%),
+          var(--bg);
+        color: var(--ink);
+        min-height: 100vh;
+        -webkit-font-smoothing: antialiased;
+      }
+      .wrap {
+        max-width: 680px;
+        margin: 0 auto;
+        padding: 40px 20px 56px;
+      }
+
+      /* ---------- 头部 ---------- */
+      header { text-align: center; margin-bottom: 30px; }
+      .moon {
+        width: 44px; height: 44px;
+        margin: 0 auto 14px;
+        color: var(--moon);
+        display: block;
+      }
+      h1 {
+        font-family: "Noto Serif SC", serif;
+        font-weight: 900;
+        font-size: clamp(30px, 7vw, 42px);
+        letter-spacing: .04em;
+        margin: 0 0 10px;
+        line-height: 1.25;
+      }
+      .sub {
+        margin: 0;
+        color: var(--ink-soft);
+        font-size: 15px;
+        letter-spacing: .12em;
+      }
+
+      /* ---------- 抽取舞台 ---------- */
+      .stage {
+        background: var(--card);
+        border: 1px solid var(--card-line);
+        border-radius: 20px;
+        box-shadow: var(--shadow);
+        padding: 34px 24px 28px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+      .stage::before {
+        content: "";
+        position: absolute; inset: 0;
+        background:
+          radial-gradient(3px 3px at 12% 22%, var(--star) 50%, transparent 51%),
+          radial-gradient(2px 2px at 84% 16%, var(--star) 50%, transparent 51%),
+          radial-gradient(2px 2px at 70% 78%, var(--star) 50%, transparent 51%),
+          radial-gradient(3px 3px at 26% 84%, var(--star) 50%, transparent 51%),
+          radial-gradient(2px 2px at 50% 10%, var(--star) 50%, transparent 51%);
+        pointer-events: none;
+      }
+      .stage-label {
+        font-size: 12px;
+        letter-spacing: .35em;
+        color: var(--ink-soft);
+        margin: 0 0 14px;
+      }
+      .big-num {
+        font-family: "Noto Serif SC", serif;
+        font-weight: 900;
+        font-size: clamp(64px, 18vw, 96px);
+        line-height: 1;
+        color: var(--accent);
+        min-height: 1em;
+        font-variant-numeric: tabular-nums;
+      }
+      .big-num.idle { color: var(--ink-soft); opacity: .45; }
+      .topic-text {
+        font-family: "Noto Serif SC", serif;
+        font-weight: 700;
+        font-size: clamp(21px, 5.6vw, 27px);
+        line-height: 1.55;
+        margin: 16px auto 4px;
+        max-width: 26em;
+        min-height: 1.55em;
+      }
+      .topic-text.idle { color: var(--ink-soft); font-weight: 500; font-size: 17px; }
+      .stage.pop .topic-text, .stage.pop .big-num { animation: pop .38s ease; }
+      @keyframes pop {
+        0% { transform: scale(.94); opacity: .35; }
+        60% { transform: scale(1.03); opacity: 1; }
+        100% { transform: scale(1); }
+      }
+      .stage-actions {
+        margin-top: 24px;
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        flex-wrap: wrap;
+        position: relative;
+      }
+      button {
+        font-family: inherit;
+        cursor: pointer;
+        border-radius: 999px;
+        min-height: 48px;
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: .06em;
+        padding: 0 26px;
+        transition: transform .12s ease, background .15s ease, border-color .15s ease;
+      }
+      button:active { transform: scale(.97); }
+      .btn-draw {
+        background: var(--accent);
+        color: var(--accent-ink);
+        border: 1px solid var(--accent);
+        min-width: 190px;
+      }
+      .btn-ghost {
+        background: transparent;
+        color: var(--ink);
+        border: 1px solid var(--card-line);
+      }
+      .btn-ghost:disabled { opacity: .4; cursor: default; }
+      .progress {
+        margin-top: 20px;
+        color: var(--ink-soft);
+        font-size: 13px;
+        letter-spacing: .08em;
+      }
+      .progress b { color: var(--accent); font-weight: 700; }
+      .copied-tip {
+        margin-top: 10px;
+        font-size: 13px;
+        color: var(--accent);
+        min-height: 1.2em;
+        opacity: 0;
+        transition: opacity .25s ease;
+      }
+      .copied-tip.show { opacity: 1; }
+
+      /* ---------- 天数进度 ---------- */
+      .day-wrap {
+        margin-top: 24px;
+        padding-top: 22px;
+        border-top: 1px dashed var(--card-line);
+        position: relative;
+        text-align: left;
+      }
+      .day-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 12px;
+      }
+      .day-title {
+        font-family: "Noto Serif SC", serif;
+        font-weight: 700;
+        font-size: 18px;
+        letter-spacing: .04em;
+      }
+      .day-title b {
+        color: var(--accent);
+        font-weight: 900;
+        font-size: 22px;
+        font-variant-numeric: tabular-nums;
+      }
+      .day-total {
+        color: var(--ink-soft);
+        font-size: 13px;
+        letter-spacing: .08em;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
+      .day-bar {
+        margin-top: 12px;
+        height: 9px;
+        border-radius: 999px;
+        background: var(--accent-soft);
+        overflow: hidden;
+        position: relative;
+      }
+      .day-fill {
+        height: 100%;
+        width: 0;
+        background: var(--accent);
+        border-radius: 999px;
+        transition: width .6s ease;
+      }
+      .day-note {
+        margin: 9px 0 0;
+        font-size: 12.5px;
+        color: var(--ink-soft);
+        letter-spacing: .06em;
+      }
+
+      /* ---------- 已聊编号 ---------- */
+      .seen-wrap { margin-top: 34px; text-align: center; }
+      .seen-label {
+        font-size: 12px;
+        letter-spacing: .35em;
+        color: var(--ink-soft);
+        margin: 0 0 14px;
+      }
+      .seen-nums {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: center;
+      }
+      .seen-nums span {
+        font-family: "Noto Serif SC", serif;
+        font-weight: 700;
+        font-size: 14px;
+        font-variant-numeric: tabular-nums;
+        color: var(--ink-soft);
+        border: 1px solid var(--card-line);
+        background: var(--card);
+        border-radius: 999px;
+        padding: 4px 12px;
+        min-width: 3em;
+      }
+      .seen-nums span.latest {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+      .seen-empty {
+        color: var(--ink-soft);
+        font-size: 14px;
+        letter-spacing: .1em;
+        margin: 0;
+      }
+
+      footer {
+        margin-top: 44px;
+        text-align: center;
+        color: var(--ink-soft);
+        font-size: 13px;
+        letter-spacing: .15em;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .stage.pop .topic-text, .stage.pop .big-num { animation: none; }
+        button { transition: none; }
+        .day-fill { transition: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <svg class="moon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M20.6 14.2A8.8 8.8 0 1 1 9.8 3.4a7.2 7.2 0 1 0 10.8 10.8Z" fill="currentColor"/>
+          <circle cx="17.5" cy="5" r="1.1" fill="currentColor" opacity=".7"/>
+          <circle cx="21" cy="9.5" r=".8" fill="currentColor" opacity=".5"/>
+        </svg>
+        <h1>没有话题我们可以聊</h1>
+        <p class="sub">抽一个编号 · 慢慢聊</p>
+      </header>
+
+      <section class="stage" id="stage" aria-live="polite">
+        <p class="stage-label">今 日 话 题</p>
+        <div class="big-num idle" id="bigNum">?</div>
+        <p class="topic-text idle" id="topicText">点下面的按钮，随机抽一个话题开始聊</p>
+        <div class="stage-actions">
+          <button class="btn-draw" id="drawBtn" type="button">随机抽一个</button>
+          <button class="btn-ghost" id="copyBtn" type="button" disabled>复制话题</button>
+        </div>
+        <p class="progress" id="progress">还没开始聊</p>
+        <p class="copied-tip" id="copiedTip">已复制，去发给对方吧</p>
+
+        <div class="day-wrap">
+          <div class="day-head">
+            <span class="day-title">第 <b id="dayNum">0</b> 天</span>
+          </div>
+          <div class="day-bar" role="progressbar" aria-label="天数进度" aria-valuemin="0" aria-valuemax="25" aria-valuenow="0" id="dayBar">
+            <div class="day-fill" id="dayFill"></div>
+          </div>
+          <p class="day-note" id="dayNote">抽到第一题的那天，就是第一天</p>
+        </div>
+      </section>
+
+      <div class="seen-wrap">
+        <p class="seen-label">已 聊 过 的 编 号</p>
+        <div class="seen-nums" id="seenNums"></div>
+        <p class="seen-empty" id="seenEmpty">题目都藏好了，抽到哪题聊哪题</p>
+      </div>
+
+      <footer>聊到哪算哪 · 不用赶时间</footer>
+    </div>
+
+    <script>
+      var TOPICS = [
+        "偶尔会莫名低落的时刻",
+        "小时候印象很深的小事",
+        "心里向往的小城",
+        "不常和别人说的小情绪",
+        "单曲循环很久的歌",
+        "心里害怕失去的东西",
+        "独自觉得孤单的傍晚",
+        "以后想去的远方",
+        "藏起来的细碎想法",
+        "成长里小小的遗憾",
+        "阴天的时候会想什么",
+        "如果可以拥有一个超能力",
+        "最容易被触动的瞬间",
+        "安静发呆时脑海的画面",
+        "学生时代最难忘的片段",
+        "会偷偷共情的故事",
+        "疲惫的时候会怎么自愈",
+        "不喜欢被人看穿的地方",
+        "傍晚散步会思考的事",
+        "觉得温柔的小事",
+        "如果能回到某一个日子",
+        "耳机里不愿分享的歌",
+        "压力大的时候会做什么",
+        "期待但很难实现的小事",
+        "觉得人与人之间奇妙的缘"
+      ];
+
+      var stage = document.getElementById("stage");
+      var bigNum = document.getElementById("bigNum");
+      var topicText = document.getElementById("topicText");
+      var drawBtn = document.getElementById("drawBtn");
+      var copyBtn = document.getElementById("copyBtn");
+      var progress = document.getElementById("progress");
+      var copiedTip = document.getElementById("copiedTip");
+      var seenNumsEl = document.getElementById("seenNums");
+      var seenEmptyEl = document.getElementById("seenEmpty");
+      var dayNumEl = document.getElementById("dayNum");
+      var dayBarEl = document.getElementById("dayBar");
+      var dayFillEl = document.getElementById("dayFill");
+      var dayNoteEl = document.getElementById("dayNote");
+      var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      var current = -1;          // 当前话题下标，-1 表示还没抽
+      var seen = {};             // 聊过的下标集合
+      var seenCount = 0;
+      var rolling = false;
+      var rollTimer = null;
+
+      // 已聊编号条：只露编号，不露题目
+      function renderSeenNums() {
+        seenNumsEl.innerHTML = "";
+        var order = Object.keys(seen).map(Number).sort(function (a, b) { return a - b; });
+        order.forEach(function (i) {
+          var s = document.createElement("span");
+          s.textContent = pad(i + 1);
+          if (i === current) s.className = "latest";
+          seenNumsEl.appendChild(s);
+        });
+        seenEmptyEl.style.display = order.length ? "none" : "";
+      }
+
+      function pad(n) { return (n < 10 ? "0" : "") + n; }
+
+      /* ---------- 天数进度：按实际抽过话题的日子累计，记在本机浏览器里 ---------- */
+      var DAY_KEY = "mei-you-hua-ti-days-v1";
+      var dayList = loadDays();
+
+      function loadDays() {
+        try {
+          var raw = localStorage.getItem(DAY_KEY);
+          if (!raw) return [];
+          var arr = JSON.parse(raw);
+          if (!Array.isArray(arr)) return [];
+          return arr.filter(function (s) { return typeof s === "string"; });
+        } catch (e) { return []; }
+      }
+
+      function saveDays() {
+        try { localStorage.setItem(DAY_KEY, JSON.stringify(dayList)); } catch (e) {}
+      }
+
+      function todayStr() {
+        var d = new Date();
+        return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+      }
+
+      // 每天第一次抽到话题，日子加一；断了不清零
+      function recordToday() {
+        var t = todayStr();
+        if (dayList.indexOf(t) === -1) {
+          dayList.push(t);
+          saveDays();
+        }
+        renderDays();
+      }
+
+      function renderDays() {
+        var n = dayList.length;
+        var shown = Math.min(n, TOPICS.length);
+        dayNumEl.textContent = n;
+        dayFillEl.style.width = (shown / TOPICS.length * 100) + "%";
+        dayBarEl.setAttribute("aria-valuenow", shown);
+        if (n === 0) {
+          dayNoteEl.textContent = "抽到第一题的那天，就是第一天";
+        } else if (n < TOPICS.length) {
+          dayNoteEl.textContent = "已经一起走过 " + n + " 天";
+        } else {
+          dayNoteEl.textContent = "都走完了，剩下的日子慢慢聊";
+        }
+      }
+
+      function updateProgress() {
+        if (seenCount === 0) {
+          progress.innerHTML = "还没开始聊";
+        } else if (seenCount >= TOPICS.length) {
+          progress.innerHTML = "话题都聊过一遍了，可以 <b>从头再来</b>";
+        } else {
+          progress.innerHTML = "今晚已聊 <b>" + seenCount + "</b> 个话题";
+        }
+      }
+
+      function selectTopic(i) {
+        current = i;
+        bigNum.textContent = pad(i + 1);
+        bigNum.classList.remove("idle");
+        topicText.textContent = "聊" + TOPICS[i];
+        topicText.classList.remove("idle");
+        copyBtn.disabled = false;
+        drawBtn.textContent = "换一个话题";
+        if (!seen[i]) { seen[i] = true; seenCount++; }
+        recordToday();
+        renderSeenNums();
+        updateProgress();
+        stage.classList.remove("pop");
+        void stage.offsetWidth;
+        stage.classList.add("pop");
+      }
+
+      function pickRandom() {
+        // 全部聊过后重置，从头再来
+        if (seenCount >= TOPICS.length) {
+          seen = {}; seenCount = 0;
+          renderSeenNums();
+        }
+        var pool = [];
+        for (var i = 0; i < TOPICS.length; i++) {
+          if (!seen[i] && i !== current) pool.push(i);
+        }
+        if (pool.length === 0) pool = [current];
+        return pool[Math.floor(Math.random() * pool.length)];
+      }
+
+      function draw() {
+        if (rolling) return;
+        var target = pickRandom();
+        if (reduceMotion) { selectTopic(target); return; }
+        rolling = true;
+        drawBtn.disabled = true;
+        var start = Date.now();
+        var duration = 650;
+        var ticks = 0;
+        rollTimer = setInterval(function () {
+          ticks++;
+          var elapsed = Date.now() - start;
+          var r = Math.floor(Math.random() * TOPICS.length);
+          bigNum.textContent = pad(r + 1);
+          bigNum.classList.remove("idle");
+          topicText.textContent = "聊" + TOPICS[r];
+          topicText.classList.remove("idle");
+          // 双条件落定：真实时钟走完时长，或动画帧数已够（防时钟被冻结的环境）
+          if (elapsed >= duration || ticks >= 10) {
+            clearInterval(rollTimer);
+            rollTimer = null;
+            rolling = false;
+            drawBtn.disabled = false;
+            selectTopic(target);
+          }
+        }, 70);
+      }
+
+      drawBtn.addEventListener("click", draw);
+
+      copyBtn.addEventListener("click", function () {
+        if (current < 0) return;
+        var text = (current + 1) + ". 聊" + TOPICS[current];
+        function done() {
+          copiedTip.classList.add("show");
+          setTimeout(function () { copiedTip.classList.remove("show"); }, 1800);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(done, function () { fallbackCopy(text); done(); });
+        } else {
+          fallbackCopy(text); done();
+        }
+      });
+
+      function fallbackCopy(text) {
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand("copy"); } catch (e) {}
+        document.body.removeChild(ta);
+      }
+
+      renderSeenNums();
+      updateProgress();
+      renderDays();
+    </script>
+  </body>
+</html>
